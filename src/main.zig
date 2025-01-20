@@ -151,9 +151,6 @@ fn GraphEdge(comptime E: type) type {
 }
 
 fn GraphNeighbor(comptime E: type, comptime EdgeIndex: type, comptime NodeIndex: type) type {
-    comptime {
-        // TODO check if EdgeIndex && NodeIndex can be used for indexing
-    }
     return struct {
         const Self = @This();
 
@@ -243,11 +240,11 @@ fn Graph(comptime N: type, comptime E: type, comptime Et: EdgeType, comptime Nod
             return cloned;
         }
 
-        pub fn nodes_count(self: Self) usize {
+        pub fn nodesCount(self: Self) usize {
             return self.nodes.len();
         }
 
-        pub fn edges_count(self: Self) usize {
+        pub fn edgesCount(self: Self) usize {
             return self.edges.len();
         }
 
@@ -578,15 +575,15 @@ pub fn visitorFunction(context: @TypeOf(null), node: u32) void {
 pub fn dfs(
     comptime G: type,
     graph: *G,
-    start: G.NodeIndex,
+    start: G.NodeIndexType,
     context: anytype,
-    comptime visitor: fn (@TypeOf(context), G.NodeIndex) void,
+    comptime visitor: fn (@TypeOf(context), G.NodeIndexType) void,
 ) void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     // if graph has allocator, use it else use std.mem.heap
     const allocator = if (!G.isComptime()) graph.allocator orelse gpa.allocator() else gpa.allocator();
 
-    var visited = std.AutoHashMap(G.NodeIndex, void).init(allocator);
+    var visited = std.AutoHashMap(G.NodeIndexType, void).init(allocator);
     defer visited.deinit();
 
     const NeighborIterator = struct {
